@@ -4,77 +4,47 @@ package client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.logging.Logger;
+
+import objects.User;
 
 public class Client {
+	private String serverIP = "localhost";
+	private int serverPort = 5555;
+	private Socket socket = null;
+	private ObjectOutputStream toServer;
+	private ObjectInputStream fromServer;
 	
-	Socket client;
-	PrintWriter writer;
-	BufferedReader reader;
-	
-	static GUI screen;
-	static Client c;
+	private final static Logger log = Utils.createLogger(Client.class.getName());
 
+	
 	public static void main(String[] args) {
-		c = new Client();
-		screen = new GUI(c);
-		
-		//GUI initialisieren 
-		screen.getFrame().setVisible(true);
-		
-		Thread t_message = new Thread(new ServerListener());
-		t_message.start();
-	}
-	
-	//Konstruktor
-	public Client() {
-		super();
-	}
-		
-	public class ServerListener implements Runnable{
-
-		@Override
-		public void run() {
-			String message;
-			
-			//Auf Nachricht überprüfen
-			try {
-				while((message = reader.readLine())!=null) {
-					appendMessage(message);
-					screen.getTa().setCaretPosition(screen.getTa().getText().length());
-				}
-			} catch (IOException e) {
-				appendMessage("Nachricht konnte nicht gesendet werden");
-				e.printStackTrace();
-			}	
-		}
-	}
-	
-	public boolean connectToServer() {
 		try {
-			client = new Socket("127.0.0.1", 5555);
-			reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			appendMessage("Netzwerkverbindung hergestellt");
-			
-			return true;
+			Client client = new Client();
+			client.connectToServer();
 		} catch (IOException e) {
-			appendMessage("Netzwerverbindung konnte nicht hergestellt werden");
-			e.printStackTrace();
-			return false;
+			log.severe(e.getMessage());
 		}
-	}
-	
-	public void appendMessage(String message) {
-		screen.getTa().append(message + "\n");
-	}
-	
-	//Nachricht senden
-	public void sendMessageToServer() {
-		writer.println(screen.getNickField().getText()+": "+screen.getText().getText());
-		writer.flush();
 		
-		screen.getText().setText("");;
-		screen.getText().requestFocus();
+		
 	}
+	
+	public void connectToServer() throws IOException {
+		log.info("Verbinde zu " + this.serverIP);
+		socket = new Socket(this.serverIP, this.serverPort);
+
+		User user = new User();
+		user.setName("Hans");
+		
+        toServer = new ObjectOutputStream(socket.getOutputStream());
+        toServer.writeObject(user);
+        log.info("Verbindung hat geklapp");
+        socket.close();
+	}
+		
+
 }
