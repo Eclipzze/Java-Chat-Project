@@ -1,14 +1,13 @@
 package server;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
-import java.io.PrintWriter;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import objects.User;
@@ -19,12 +18,12 @@ public class Server {
 	private int port = 5555;
 	private ServerSocket socket = null;
 	private final static Logger log = Utils.createLogger(Server.class.getName());
+	static Vector<ClientHandler> clients = new Vector<>(); 
 	
 	public static void main(String[] args) {
 		try {
-			Server server = new Server();
+			Server server = new Server(args);
 			server.start();
-			
 			server.listen();
 			
 		} catch (IOException | ClassNotFoundException e) {
@@ -32,6 +31,11 @@ public class Server {
 		}
 	}
 	
+	public Server(String[] params) {
+		if (params.length > 0) {
+			this.port = Integer.parseInt(params[0]);
+		}
+	}
 	
 	public void start() throws IOException {
 		socket = new ServerSocket(this.port);
@@ -44,11 +48,17 @@ public class Server {
 			Socket clientSocket = socket.accept();
 			log.info("Verbindungsaufbau von " + clientSocket.getInetAddress().toString());
 
-			log.fine("User Authentification");
-			ObjectInputStream fromClient  = new ObjectInputStream(clientSocket.getInputStream());
-
-			User user = (User)fromClient.readObject();
-			log.info("Verbindung erfolgreich aufgebaut von " + user.getName());
+			ObjectOutputStream toClient = new ObjectOutputStream(clientSocket.getOutputStream());
+			ObjectInputStream fromClient = new ObjectInputStream(clientSocket.getInputStream()); 
+            
+            log.info("Erstelle neuen Handler für den Client....");
+			ClientHandler handler = new ClientHandler(clientSocket, fromClient, toClient);
+			
+			
+			Thread thread = new Thread(handler); 
+			clients.add(handler);
+			
+			thread.start();
 		}
 		
 		
