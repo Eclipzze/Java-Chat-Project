@@ -37,11 +37,11 @@ public class Client {
 	}
 	
 	public Client(String name) {
-    	user = new User();
-    	user.setUsername(name);
-    	user.setLoggedIn(false);
-    	
-    	
+		user = new User();
+		user.setUsername(name);
+		user.setLoggedIn(false);
+		
+		
 	}
 	
 	public void connectToServer() throws IOException {
@@ -53,25 +53,25 @@ public class Client {
 		
 
 		Thread sendMessage = new Thread(new Runnable() { 
-            @Override
-            public void run() {
-            	try {
-            		//Authentifiziere den Client
-            		toServer.writeObject(user);
-            		
-            		//Warte auf eine Anwort
+			@Override
+			public void run() {
+				try {
+					//Authentifiziere den Client
+					toServer.writeObject(user);
+					
+					//Warte auf eine Anwort
 					synchronized (Thread.currentThread()) {
 						Thread.currentThread().wait();
-					}        		
+					}				
 
 					/*
-            		while (sendQueue.peek() != null) {
-            			toServer.wrt
-            			
-            			
-            		}
-            		*/
-            	
+					while (sendQueue.peek() != null) {
+						toServer.wrt
+						
+						
+					}
+					*/
+				
 					//Thread.currentThread().wait();
 					
 
@@ -87,65 +87,65 @@ public class Client {
 					// TODO Auto-generated catch block
 					log.severe(e1.getMessage());
 				}
-            	
-            	
-            	/*
-                while (true) { 
-                	Game msg = new Game();
-                	msg.setStatus("start");
-                	
-                	try {
+				
+				
+				/*
+				while (true) { 
+					Game msg = new Game();
+					msg.setStatus("start");
+					
+					try {
 						toServer.writeObject(msg);
 					} catch (IOException e) {
 						log.severe(e.getMessage());
 						// TODO Auto-generated catch block
 						//e.printStackTrace();
 					}
-                	
-                	break;
-                } 
-                */
-            } 
-        }); 
-          
-        // readMessage thread 
-        Thread readMessage = new Thread(new Runnable()  
-        { 
-            @Override
-            public void run() { 
-                while (true) { 
-                    try { 
-                    	Object obj = fromServer.readObject();
-                    	if (obj instanceof User) {
-                    		user = (User) obj;
-                    		if (user.getLoggedIn()) {
-                    			log.info("Erfolgreich eingeloggt");
-                    		}
+					
+					break;
+				} 
+				*/
+			} 
+		}); 
+		  
+		// readMessage thread 
+		Thread readMessage = new Thread(new Runnable()  
+		{ 
+			@Override
+			public void run() { 
+				while (true) { 
+					try { 
+						Object obj = fromServer.readObject();
+						if (obj instanceof User) {
+							user = (User) obj;
+							if (user.getLoggedIn()) {
+								log.info("Erfolgreich eingeloggt");
+							}
 
-        					synchronized (sendMessage) {
-        						sendMessage.notify();
-        					}
-                    	}
-            			else if(obj instanceof Message) {
-            				log.info("msg");
-            			}       
-                    	
-                	} catch (SocketException e) {
-                		log.info("Verbindung verloren");
-                		break;
-    					
-                    	
-                    } catch (IOException | ClassNotFoundException e) { 
+							synchronized (sendMessage) {
+								sendMessage.notify();
+							}
+						}
+						else if(obj instanceof Message) {
+							log.info("msg");
+						}	   
+						
+					} catch (SocketException e) {
+						log.info("Verbindung verloren");
+						break;
+						
+						
+					} catch (IOException | ClassNotFoundException e) { 
   
-                        e.printStackTrace(); 
-                    } 
-                } 
-            } 
-        }); 
+						e.printStackTrace(); 
+					} 
+				} 
+			} 
+		}); 
   
-        sendMessage.start(); 
-        readMessage.start(); 
-        
+		sendMessage.start(); 
+		readMessage.start(); 
+		
 	}
 		
 

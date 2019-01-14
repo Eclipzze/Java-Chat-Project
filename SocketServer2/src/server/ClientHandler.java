@@ -26,16 +26,15 @@ public class ClientHandler implements Runnable {
 	
 	@Override
 	public void run() {
-		while (true)  
-        { 
+		while (true) { 
 			try {
 				Object obj = fromClient.readObject();
 				log.fine("Neues Object empfangen");
 				if (obj instanceof User){
-					User user = (User) obj;
+					user = (User) obj;
 					if (!user.getLoggedIn()){
 						log.info("Authentifiziere " + user.getUsername());
-						((User) obj).setLoggedIn(true);
+						user.setLoggedIn(true);
 
 						log.info(user.getUsername() + " erfolgreich authentifiziert");
 						toClient.writeObject(user);								
@@ -47,9 +46,9 @@ public class ClientHandler implements Runnable {
 				else {
 					log.info(obj.getClass().getName());
 				}
-        	} catch (SocketException e) {
-        		log.fine("Verbindung verloren");
-        		break;
+			} catch (SocketException e) {
+				log.fine("Verbindung verloren");
+				break;
 				
 			} catch (ClassNotFoundException | IOException e) {
 				// TODO Auto-generated catch block
@@ -57,6 +56,6 @@ public class ClientHandler implements Runnable {
 				log.info(e.getMessage());
 				
 			}
-        }		
+		}		
 	}
 }
