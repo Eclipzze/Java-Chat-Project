@@ -51,7 +51,7 @@ public class Server {
 			ObjectOutputStream toClient = new ObjectOutputStream(clientSocket.getOutputStream());
 			ObjectInputStream fromClient = new ObjectInputStream(clientSocket.getInputStream()); 
             
-            log.info("Erstelle neuen Handler für den Client....");
+			log.fine("Erstelle neuen Handler für den Client....");
 			ClientHandler handler = new ClientHandler(clientSocket, fromClient, toClient);
 			
 			
@@ -60,7 +60,5 @@ public class Server {
 			
 			thread.start();
 		}
-		
-		
 	}
 }
