@@ -7,16 +7,17 @@ import java.util.Date;
 
 public class Message  implements Serializable {
 	private static final long serialVersionUID = 863053837519833472L;
-	private String author;
+	private User author;
 	private String text;
+	private String receiver;
 	private Date datum = new Date();
 	
 
-	public String getAuthor() {
+	public User getAuthor() {
 		return author;
 	}
 	
-	public void setAuthor(String author) {
+	public void setAuthor(User author) {
 		this.author = author;
 	}
 	
@@ -35,9 +36,18 @@ public class Message  implements Serializable {
 	public void setDatum(Date datum) {
 		this.datum = datum;
 	}	
+	
+	public String getReceiver() {
+		return receiver;
+	}
+
+	public void setReceiver(String receiver) {
+		this.receiver = receiver;
+	}
+	
 	@Override
 	public String toString() {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		return dateFormat.format(datum) + " - " + author + ": "  + text;
+		return dateFormat.format(datum) + " - " + author.getUsername() + ": "  + text;
 	}
 }
