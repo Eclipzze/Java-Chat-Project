@@ -7,6 +7,10 @@ import java.awt.CardLayout;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+
+import client.Client;
+import objects.User;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
@@ -18,7 +22,9 @@ public class Window {
 
 	private JFrame frame;
 	private JTextField txtUsername;
-
+	private Client socketClient;
+	private JTextField txtPassword;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -58,6 +64,19 @@ public class Window {
 		JButton btnLogin = new JButton("Login");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				User user = new User();
+				System.out.println(Thread.currentThread().getName());
+				user.setUsername(txtUsername.getText());
+				user.setPassword(txtPassword.getText());
+				user.setLoggedIn(false);
+				System.out.println("Cliecked");
+				//socketClient = new Client();
+				
+				Thread a = new Thread(new Client(user));
+				a.start();
+
+				//socketClient.au(user);
+				
 			}
 		});
 		btnLogin.setBounds(384, 167, 97, 25);
@@ -67,6 +86,11 @@ public class Window {
 		txtUsername.setBounds(110, 167, 244, 25);
 		panelLogin.add(txtUsername);
 		txtUsername.setColumns(10);
+		
+		txtPassword = new JTextField();
+		txtPassword.setBounds(110, 215, 244, 25);
+		panelLogin.add(txtPassword);
+		txtPassword.setColumns(10);
 		
 		JPanel panelMain = new JPanel();
 		frame.getContentPane().add(panelMain, "name_283202674467900");

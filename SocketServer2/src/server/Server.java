@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -17,23 +18,29 @@ import objects.User;
 public class Server {
 	private int port = 5555;
 	private ServerSocket socket = null;
-	private final static Logger log = Utils.createLogger(Server.class.getName());
+	
+	private final static Logger log = Utils.createLogger(Server.class.getSimpleName());
 	static Vector<ClientHandler> clients = new Vector<>(); 
 	
 	public static void main(String[] args) {
 		try {
+			Datenbank.loadConfig();
+			Datenbank.connect();
+			//Datenbank.resetUserStatus()
+			
 			Server server = new Server(args);
 			server.start();
 			server.listen();
 			
-		} catch (IOException | ClassNotFoundException e) {
-			log.severe(e.getMessage());
+		} catch (IOException | ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			//log.severe(e.getMessage());
 		}
 	}
 	
 	public Server(String[] params) {
 		if (params.length > 0) {
-			this.port = Integer.parseInt(params[0]);
+			 this.port = Integer.parseInt(params[0]);
 		}
 	}
 	
